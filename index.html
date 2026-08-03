@@ -240,22 +240,7 @@
     el.classList.add('touched-error');
     if (errEl) errEl.textContent = msg;
   }
-  (function() {
-    var textFields = ['mName', 'mEmail'];
-    textFields.forEach(function(id) {
-      document.getElementById(id).addEventListener('input', function() {
-        var el = document.getElementById(id);
-        var errEl = document.getElementById(id + 'Error');
-        el.classList.remove('touched-error');
-        if (errEl) errEl.textContent = '';
-      });
-    });
-    document.getElementById('mConsent').addEventListener('change', function() {
-      var errEl = document.getElementById('mConsentError');
-      document.getElementById('mConsent').classList.remove('touched-error');
-      if (errEl) errEl.textContent = '';
-    });
-  })();
+  
   function submitReport() {
     clearModalErrors();
     var name = document.getElementById('mName').value.trim();
@@ -301,6 +286,25 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    var textFields = ['mName', 'mEmail'];
+    textFields.forEach(function(id) {
+      document.getElementById(id).addEventListener('input', function() {
+        var el = document.getElementById(id);
+        var errEl = document.getElementById(id + 'Error');
+        el.classList.remove('touched-error');
+        if (errEl) errEl.textContent = '';
+      });
+    });
+    document.getElementById('mConsent').addEventListener('change', function() {
+      var errEl = document.getElementById('mConsentError');
+      document.getElementById('mConsent').classList.remove('touched-error');
+      if (errEl) errEl.textContent = '';
+    });
+  })();
+</script>
 
 </body>
 </html>
