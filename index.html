@@ -153,8 +153,8 @@
       <div class="eyebrow">Reports &amp; Disclosures</div>
       <h2 style="font-size:34px; max-width:680px;">Sustainable finance, financial statements, and the paperwork, in one place.</h2>
       <div class="disc-lines">
-        <div class="disc-row"><span class="dl-label">Sustainability Report</span><span class="dl-links"><a href="https://www.ocbcventura.com/assets/reports/sustainability-2021.pdf" target="_blank" rel="noopener">2021</a> <a href="https://www.ocbcventura.com/assets/reports/sustainability-2022.pdf" target="_blank" rel="noopener">2022</a> <a href="https://www.ocbcventura.com/assets/reports/sustainability-2023.pdf" target="_blank" rel="noopener">2023</a> <a href="https://www.ocbcventura.com/assets/reports/sustainability-2024.pdf" target="_blank" rel="noopener">2024</a> <a href="https://www.ocbcventura.com/assets/reports/sustainability-2025.pdf" target="_blank" rel="noopener">2025</a></span></div>
-        <div class="disc-row"><span class="dl-label">Audited Financial Statement</span><span class="dl-links"><a href="https://www.ocbcventura.com/assets/reports/audited-financial-statements-2023.pdf" target="_blank" rel="noopener">2023</a> <a href="https://www.ocbcventura.com/assets/reports/audited-financial-statements-2024.pdf" target="_blank" rel="noopener">2024</a> <a href="https://www.ocbcventura.com/assets/reports/audited-financial-statements-2025.pdf" target="_blank" rel="noopener">2025</a></span></div>
+        <div class="disc-row"><span class="dl-label">Sustainability Report</span><span class="dl-links"><a href="#" onclick="openReport('Sustainability Report 2021');return false;">2021</a> <a href="#" onclick="openReport('Sustainability Report 2022');return false;">2022</a> <a href="#" onclick="openReport('Sustainability Report 2023');return false;">2023</a> <a href="#" onclick="openReport('Sustainability Report 2024');return false;">2024</a> <a href="#" onclick="openReport('Sustainability Report 2025');return false;">2025</a></span></div>
+        <div class="disc-row"><span class="dl-label">Audited Financial Statement</span><span class="dl-links"><a href="#" onclick="openReport('Audited Financial Statement 2023');return false;">2023</a> <a href="#" onclick="openReport('Audited Financial Statement 2024');return false;">2024</a> <a href="#" onclick="openReport('Audited Financial Statement 2025');return false;">2025</a></span></div>
         <div class="disc-row"><span class="dl-label">Privacy Policy</span><span class="dl-links"><a href="https://www.ocbcventura.com/assets/reports/privacy-policy-ina.pdf" target="_blank" rel="noopener">ID</a> <span class="dl-sep">|</span> <a href="https://www.ocbcventura.com/assets/reports/privacy-policy-eng.pdf" target="_blank" rel="noopener">EN</a></span></div>
         <div class="disc-row"><span class="dl-label">Customer Consent Form</span><span class="dl-links"><a href="https://www.ocbcventura.com/assets/reports/customer-consent-form-corporate.pdf" target="_blank" rel="noopener">Corporate</a> <span class="dl-sep">|</span> <a href="https://www.ocbcventura.com/assets/reports/customer-consent-form-individual.pdf" target="_blank" rel="noopener">Individual</a></span></div>
         <div class="disc-row"><span class="dl-label">Data Subject Access Rights</span><span class="dl-links"><a href="https://www.ocbcventura.com/assets/reports/data-subject-access-rights.pdf" target="_blank" rel="noopener">Access here</a></span></div>
@@ -211,7 +211,96 @@
       document.getElementById('navlist').classList.remove('open');
     });
   });
+
+  var currentReport = '';
+  function openReport(name) {
+    currentReport = name;
+    document.getElementById('mReportName').textContent = name;
+    document.getElementById('mForm').style.display = '';
+    document.getElementById('mSuccess').style.display = 'none';
+    document.getElementById('reportModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeReport() {
+    document.getElementById('reportModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function clearModalErrors() {
+    var fields = ['mName', 'mEmail', 'mConsent'];
+    fields.forEach(function(id) {
+      var el = document.getElementById(id);
+      var errEl = document.getElementById(id + 'Error');
+      el.classList.remove('touched-error');
+      if (errEl) errEl.textContent = '';
+    });
+  }
+  function showFieldError(id, msg) {
+    var el = document.getElementById(id);
+    var errEl = document.getElementById(id + 'Error');
+    el.classList.add('touched-error');
+    if (errEl) errEl.textContent = msg;
+  }
+  (function() {
+    var textFields = ['mName', 'mEmail'];
+    textFields.forEach(function(id) {
+      document.getElementById(id).addEventListener('input', function() {
+        var el = document.getElementById(id);
+        var errEl = document.getElementById(id + 'Error');
+        el.classList.remove('touched-error');
+        if (errEl) errEl.textContent = '';
+      });
+    });
+    document.getElementById('mConsent').addEventListener('change', function() {
+      var errEl = document.getElementById('mConsentError');
+      document.getElementById('mConsent').classList.remove('touched-error');
+      if (errEl) errEl.textContent = '';
+    });
+  })();
+  function submitReport() {
+    clearModalErrors();
+    var name = document.getElementById('mName').value.trim();
+    var company = document.getElementById('mCompany').value.trim();
+    var email = document.getElementById('mEmail').value.trim();
+    var position = document.getElementById('mPosition').value.trim();
+    var consent = document.getElementById('mConsent').checked;
+    var valid = true;
+    if (!name) { showFieldError('mName', 'This field is required.'); valid = false; }
+    if (!email) { showFieldError('mEmail', 'This field is required.'); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showFieldError('mEmail', 'Please enter a valid email address.'); valid = false; }
+    if (!consent) { showFieldError('mConsent', 'You must agree to the Privacy Policy to continue.'); valid = false; }
+    if (!valid) return;
+    var subject = 'Report Request: ' + currentReport;
+    var body = 'Report: ' + currentReport + '%0A%0AName: ' + name + '%0ACompany: ' + company + '%0AEmail: ' + email + '%0APosition: ' + position;
+    window.location.href = 'mailto:investment@ocbcventura.com?subject=' + encodeURIComponent(subject) + '&body=' + body;
+    document.getElementById('mSuccessName').textContent = currentReport;
+    document.getElementById('mForm').style.display = 'none';
+    document.getElementById('mSuccess').style.display = 'block';
+  }
 </script>
+
+<div class="modal-overlay" id="reportModal" onclick="if(event.target===this)closeReport()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeReport()" aria-label="Close">&times;</button>
+    <div id="mForm">
+      <h3>Download Company Report</h3>
+      <p class="m-sub">Request <span id="mReportName" style="color:var(--red); font-weight:600;">the report</span> by filling in the form below. Our team will send it to your email.</p>
+      <div class="m-grid">
+        <div class="m-field"><label>Name <span>*</span></label><input id="mName" type="text" placeholder="Your name"><span class="field-error" id="mNameError"></span></div>
+        <div class="m-field"><label>Company / University</label><input id="mCompany" type="text" placeholder="Your company or university"></div>
+        <div class="m-field"><label>Email <span>*</span></label><input id="mEmail" type="email" placeholder="Your email"><span class="field-error" id="mEmailError"></span></div>
+        <div class="m-field"><label>Position / Title</label><input id="mPosition" type="text" placeholder="Your position or title"></div>
+      </div>
+      <label class="m-consent"><input type="checkbox" id="mConsent"><span>I consent to OCBC Ventura processing my personal data in order to provide access to the requested document and to develop and improve its services, in accordance with the <a href="https://www.ocbcventura.com/assets/reports/privacy-policy-eng.pdf" target="_blank" rel="noopener">Privacy Policy</a>.<span style="color:var(--red);">*</span></span></label>
+      <span class="field-error" id="mConsentError" style="margin-top:8px;"></span>
+      <div class="m-actions"><button class="btn" onclick="submitReport()">Send request</button></div>
+    </div>
+    <div class="m-success" id="mSuccess">
+      <h4>Thank you</h4>
+      <p>We've received your request for <strong id="mSuccessName"></strong>. Our team will email the report to you shortly.</p>
+      <div style="margin-top:22px;"><button class="btn btn-outline" onclick="closeReport()">Close</button></div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

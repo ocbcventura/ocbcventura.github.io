@@ -327,7 +327,8 @@ section { padding: 96px 0; }
 .field-error { display: block; font-size: 12.5px; color: var(--red); margin-top: 6px; min-height: 0; }
 .form-field input.touched-error,
 .form-field select.touched-error,
-.form-field textarea.touched-error { border-color: var(--red); }
+.form-field textarea.touched-error,
+.m-field input.touched-error { border-color: var(--red); }
 
 /* =========================================
    FOOTER
@@ -407,4 +408,59 @@ footer { background: var(--maroon); color: rgba(255,255,255,0.8); padding: 64px 
   .pf-grid, .sector-grid, .logo-wall { grid-template-columns: 1fr 1fr; }
   .stat .num { font-size: 40px; }
   section { padding: 68px 0; }
+  .m-grid { grid-template-columns: 1fr; }
+  .modal { padding: 40px 24px; }
 }
+
+/* =========================================
+   REPORT REQUEST MODAL
+   ========================================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(23,19,15,0.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 1000; padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--paper); max-width: 660px; width: 100%;
+  padding: 46px 44px; position: relative;
+  max-height: 92vh; overflow: auto;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.32);
+}
+.modal h3 {
+  font-family: 'Fraunces', serif; font-size: 27px;
+  font-weight: 500; text-align: center; margin-bottom: 8px;
+}
+.modal .m-sub {
+  text-align: center; color: var(--ink-soft);
+  font-size: 15px; margin-bottom: 30px;
+}
+.modal-close {
+  position: absolute; top: 14px; right: 18px;
+  background: none; border: none; font-size: 26px;
+  cursor: pointer; color: var(--ink-soft); line-height: 1;
+}
+.modal-close:hover { color: var(--red); }
+.m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.m-field { display: flex; flex-direction: column; }
+.m-field label { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+.m-field label span { color: var(--red); }
+.m-field input {
+  padding: 12px 14px; border: 1px solid var(--line);
+  font-size: 15px; font-family: inherit; background: #fff;
+}
+.m-field input:focus { outline: 2px solid var(--red); border-color: var(--red); }
+.m-consent {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13.5px; color: var(--ink-soft);
+  margin-top: 20px; line-height: 1.5;
+}
+.m-consent input { margin-top: 3px; flex-shrink: 0; }
+.m-consent a { color: var(--red); }
+.m-actions { display: flex; justify-content: flex-end; margin-top: 26px; }
+.m-success { display: none; text-align: center; padding: 24px 0; }
+.m-success h4 {
+  font-family: 'Fraunces', serif; font-size: 24px;
+  color: var(--maroon); margin-bottom: 12px; font-weight: 500;
+}
+.m-success p { color: var(--ink-soft); font-size: 15px; max-width: 460px; margin: 0 auto; }
