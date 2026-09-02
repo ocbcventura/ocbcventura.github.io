@@ -22,6 +22,7 @@
 <meta name="theme-color" content="#6E140F">
 <title>OCBC Ventura — Venture Debt & Equity for Indonesia's Builders</title>
 <link rel="stylesheet" href="assets/css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -213,20 +214,57 @@
   });
 
   var currentReport = '';
+  var reportUrls = {
+    'Sustainability Report 2021': 'assets/reports/sustainability-2021.pdf',
+    'Sustainability Report 2022': 'assets/reports/sustainability-2022.pdf',
+    'Sustainability Report 2023': 'assets/reports/sustainability-2023.pdf',
+    'Sustainability Report 2024': 'assets/reports/sustainability-2024.pdf',
+    'Sustainability Report 2025': 'assets/reports/sustainability-2025.pdf',
+    'Audited Financial Statement 2023': 'assets/reports/audited-financial-statements-2023.pdf',
+    'Audited Financial Statement 2024': 'assets/reports/audited-financial-statements-2024.pdf',
+    'Audited Financial Statement 2025': 'assets/reports/audited-financial-statements-2025.pdf'
+  };
   function openReport(name) {
     currentReport = name;
     document.getElementById('mReportName').textContent = name;
     document.getElementById('mForm').style.display = '';
     document.getElementById('mSuccess').style.display = 'none';
+    document.getElementById('mPdfContainer').innerHTML = '';
     document.getElementById('reportModal').classList.add('open');
     document.body.style.overflow = 'hidden';
+  }
+  function renderPdf(url) {
+    var container = document.getElementById('mPdfContainer');
+    container.innerHTML = '<div style="text-align:center;padding:40px;">Loading PDF...</div>';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      container.innerHTML = '';
+      for (var i = 1; i <= pdf.numPages; i++) {
+        (function(pageNum) {
+          pdf.getPage(pageNum).then(function(page) {
+            var viewport = page.getViewport({ scale: 1.2 });
+            var canvas = document.createElement('canvas');
+            canvas.style.width = '100%';
+            canvas.style.display = 'block';
+            canvas.style.margin = '8px auto';
+            canvas.style.maxWidth = '100%';
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            container.appendChild(canvas);
+            page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport });
+          });
+        })(i);
+      }
+    }).catch(function(err) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">Failed to load PDF.</div>';
+    });
   }
   function closeReport() {
     document.getElementById('reportModal').classList.remove('open');
     document.body.style.overflow = '';
   }
   function clearModalErrors() {
-    var fields = ['mName', 'mEmail', 'mConsent'];
+    var fields = ['mName', 'mEmail', 'mPurpose', 'mConsent', 'mConsent2'];
     fields.forEach(function(id) {
       var el = document.getElementById(id);
       var errEl = document.getElementById(id + 'Error');
@@ -247,19 +285,26 @@
     var company = document.getElementById('mCompany').value.trim();
     var email = document.getElementById('mEmail').value.trim();
     var position = document.getElementById('mPosition').value.trim();
+    var purpose = document.getElementById('mPurpose').value.trim();
     var consent = document.getElementById('mConsent').checked;
+    var consent2 = document.getElementById('mConsent2').checked;
     var valid = true;
     if (!name) { showFieldError('mName', 'This field is required.'); valid = false; }
     if (!email) { showFieldError('mEmail', 'This field is required.'); valid = false; }
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showFieldError('mEmail', 'Please enter a valid email address.'); valid = false; }
+    if (!purpose) { showFieldError('mPurpose', 'This field is required.'); valid = false; }
     if (!consent) { showFieldError('mConsent', 'You must agree to the Privacy Policy to continue.'); valid = false; }
+    if (!consent2) { showFieldError('mConsent2', 'You must confirm to continue.'); valid = false; }
     if (!valid) return;
     var subject = 'Report Request: ' + currentReport;
-    var body = 'Report: ' + currentReport + '%0A%0AName: ' + name + '%0ACompany: ' + company + '%0AEmail: ' + email + '%0APosition: ' + position;
+    var body = 'Report: ' + currentReport + '%0A%0AName: ' + name + '%0ACompany: ' + company + '%0AEmail: ' + email + '%0APosition: ' + position + '%0APurpose: ' + purpose;
     window.location.href = 'mailto:investment@ocbcventura.com?subject=' + encodeURIComponent(subject) + '&body=' + body;
-    document.getElementById('mSuccessName').textContent = currentReport;
-    document.getElementById('mForm').style.display = 'none';
-    document.getElementById('mSuccess').style.display = 'block';
+    setTimeout(function() {
+      var pdfUrl = reportUrls[currentReport] || '';
+      document.getElementById('mForm').style.display = 'none';
+      document.getElementById('mSuccess').style.display = 'block';
+      renderPdf(pdfUrl);
+    }, 2000);
   }
 </script>
 
@@ -274,22 +319,24 @@
         <div class="m-field"><label>Company / University</label><input id="mCompany" type="text" placeholder="Your company or university"></div>
         <div class="m-field"><label>Email <span>*</span></label><input id="mEmail" type="email" placeholder="Your email"><span class="field-error" id="mEmailError"></span></div>
         <div class="m-field"><label>Position / Title</label><input id="mPosition" type="text" placeholder="Your position or title"></div>
+        <div class="m-field"><label>Purpose <span>*</span></label><input id="mPurpose" type="text" placeholder="Your purpose for requesting this report"><span class="field-error" id="mPurposeError"></span></div>
       </div>
       <label class="m-consent"><input type="checkbox" id="mConsent"><span>I consent to OCBC Ventura processing my personal data in order to provide access to the requested document and to develop and improve its services, in accordance with the <a href="https://www.ocbcventura.com/assets/reports/privacy-policy-eng.pdf" target="_blank" rel="noopener">Privacy Policy</a>.<span style="color:var(--red);">*</span></span></label>
       <span class="field-error" id="mConsentError" style="margin-top:8px;"></span>
+      <label class="m-consent" style="margin-top:12px;"><input type="checkbox" id="mConsent2"><span>I confirm that the documents will only be used for the purpose stated in this request and will not be shared with any unauthorized parties.<span style="color:var(--red);">*</span></span></label>
+      <span class="field-error" id="mConsent2Error" style="margin-top:8px;"></span>
       <div class="m-actions"><button class="btn" onclick="submitReport()">Send request</button></div>
     </div>
-    <div class="m-success" id="mSuccess">
-      <h4>Thank you</h4>
-      <p>We've received your request for <strong id="mSuccessName"></strong>. Our team will email the report to you shortly.</p>
-      <div style="margin-top:22px;"><button class="btn btn-outline" onclick="closeReport()">Close</button></div>
+    <div class="m-success" id="mSuccess" style="display:none;">
+      <div id="mPdfContainer" style="width:100%; height:75vh; overflow-y:auto; border:1px solid #ddd; border-radius:8px; background:#f5f5f5;"></div>
+      <div style="margin-top:16px;"><button class="btn btn-outline" onclick="closeReport()">Close</button></div>
     </div>
   </div>
 </div>
 
 <script>
   (function() {
-    var textFields = ['mName', 'mEmail'];
+    var textFields = ['mName', 'mEmail', 'mPurpose'];
     textFields.forEach(function(id) {
       document.getElementById(id).addEventListener('input', function() {
         var el = document.getElementById(id);
@@ -301,6 +348,11 @@
     document.getElementById('mConsent').addEventListener('change', function() {
       var errEl = document.getElementById('mConsentError');
       document.getElementById('mConsent').classList.remove('touched-error');
+      if (errEl) errEl.textContent = '';
+    });
+    document.getElementById('mConsent2').addEventListener('change', function() {
+      var errEl = document.getElementById('mConsent2Error');
+      document.getElementById('mConsent2').classList.remove('touched-error');
       if (errEl) errEl.textContent = '';
     });
   })();
