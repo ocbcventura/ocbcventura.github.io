@@ -22,7 +22,7 @@
 <meta name="theme-color" content="#6E140F">
 <title>OCBC Ventura — Venture Debt & Equity for Indonesia's Builders</title>
 <link rel="stylesheet" href="assets/css/style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="assets/js/library/pdf.min.js"></script>
 </head>
 <body>
 
@@ -236,7 +236,7 @@
   function renderPdf(url) {
     var container = document.getElementById('mPdfContainer');
     container.innerHTML = '<div style="text-align:center;padding:40px;">Loading PDF...</div>';
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/js/library/pdf.worker.min.js';
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
       container.innerHTML = '';
       for (var i = 1; i <= pdf.numPages; i++) {
